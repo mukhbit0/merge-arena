@@ -23,6 +23,16 @@ captures of the real arena UI + terminal transcript, calm voiceover.
 
 ## Status
 - [x] Transcript (demo/TRANSCRIPT.md)
-- [ ] Screen captures
-- [ ] Voiceover
-- [ ] Final render — **BLOCKED on user review of this storyboard + the demo itself**
+- [x] Screen captures (2026-10-09, local capture-server against the REAL Hono
+      app + REAL arena-ui in headless Chromium — no mockups):
+      - demo/shot-arena.png — conflict view (A: merged so far Hi+farewell,
+        B: hopper Hey), candidates + rationales, CI table, human-pick control
+      - demo/shot-ci-received.png / demo/shot-ci-passed.png — CI table both states
+      - demo/shot-decide-before.png / demo/shot-resolved.png — human pick flow
+      Pipeline: scripts/capture-server.entry.ts (esbuild bundle, real git) +
+      scripts/capture-shots.py (Playwright). Verified frame-by-frame.
+- [x] Terminal capture: demo/shot-terminal.mp4 (40s, real demo transcript,
+      rendered by scripts/render-terminal.py)
+- [x] Voiceover script: demo/VOICEOVER.md (timed narration draft, 5:00)
+- [ ] TTS voiceover audio + final render — **BLOCKED on user review of this
+      storyboard + the demo itself**
