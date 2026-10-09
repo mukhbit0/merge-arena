@@ -9,11 +9,20 @@ compatibility_flags = ["nodejs_compat"]
 [dev]
 port = 8787
 
-# Future bindings (NOT created yet — deploy phase only, via cf.py gated flow):
+# Artifacts binding (open beta, Workers Paid plan required). Namespace is
+# dedicated to this project — never point it at an existing namespace.
+[[artifacts]]
+binding = "ARTIFACTS"
+namespace = "merge-arena"
+# remote = true  # uncomment to use the remote Artifacts service in wrangler dev
+
+# Event subscription for the CI phase (verify event type against current
+# wrangler schema before relying on it):
+# [[events]]  # shape TBD — see hidden_files/artifacts-research.md
+# type = "cf.artifacts.repo.pushed"
+# source = "*"
+
+# KV binding — deploy phase only, via cf.py gated flow (new namespace only):
 # [[kv_namespaces]]
 # binding = "STATE_KV"
 # id = "<new namespace id for merge-arena-state>"
-#
-# Artifacts repo binding (open beta, Workers Paid plan required):
-# [artifacts]
-# binding = "REPO"

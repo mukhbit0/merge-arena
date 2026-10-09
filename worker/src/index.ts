@@ -10,6 +10,7 @@
 import { Hono } from "hono";
 import { getState } from "./storage";
 import { LocalGitBackend, defaultFixtureFiles, type GitBackend } from "./git-backend";
+import { ArtifactsGitBackend, type ArtifactsBindingLike } from "./artifacts-git";
 import { issueToken, verifyToken, getSecret } from "./tokens";
 import { filesTouchedBy, diffStat, excerpt } from "./diffutil";
 import type { Deps, Env, TaskRecord, AgentBrief, Submission, StoredConflict } from "./types";
@@ -26,6 +27,17 @@ function defaultGit(): GitBackend {
 
 export function getDeps(env: Env): Deps {
   return { state: getState(env), git: defaultGit(), secret: getSecret(env) };
+}
+
+/**
+ * Artifacts git backend, when the ARTIFACTS binding is configured (deploy
+ * phase). Kept separate from Deps because the artifacts merge path differs:
+ * agents push to fork remotes with minted git tokens (see artifacts-git.ts).
+ * Not wired into routes yet — the deploy phase verifies the binding live.
+ */
+export function getArtifactsGit(env: Env): ArtifactsGitBackend | null {
+  const binding = (env as { ARTIFACTS?: ArtifactsBindingLike }).ARTIFACTS;
+  return binding ? new ArtifactsGitBackend(binding) : null;
 }
 
 function defaultSeedFiles(): Record<string, string> {
