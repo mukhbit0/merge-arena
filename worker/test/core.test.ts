@@ -509,23 +509,40 @@ describe("artifacts-git (fake binding)", () => {
   it("seeds a baseline repo and forks per agent with write tokens", async () => {
     const binding = fakeBinding();
     const backend = new ArtifactsGitBackend(binding);
-    const { repoDir, baseRef } = await backend.seedFixture("abcd1234");
+    const { repoDir, baseRef, access } = await backend.seedFixture("abcd1234");
     expect(repoDir).toBe("arena-abcd1234-base");
     expect(baseRef).toBe("main");
-    expect(backend.baselineAccess("abcd1234").remote).toContain("arena-abcd1234-base.git");
+    expect(access.remote).toContain("arena-abcd1234-base.git");
 
-    const { branch } = await backend.createWorktree("abcd1234", "agent-1");
+    const { branch, remote, gitToken } = await backend.createWorktree("abcd1234", "agent-1");
     expect(branch).toBe("arena-abcd1234-agent-1");
-    const access = backend.agentAccess("abcd1234", "agent-1");
-    expect(access.token).toBe("git-tok-arena-abcd1234-agent-1");
-    expect(access.remote).toContain("arena-abcd1234-agent-1.git");
+    expect(gitToken).toBe("git-tok-arena-abcd1234-agent-1");
+    expect(remote).toContain("arena-abcd1234-agent-1.git");
     expect(binding.calls).toContain("create:arena-abcd1234-base:main");
     expect(binding.calls).toContain("fork:arena-abcd1234-agent-1:true");
     expect(binding.calls).toContain("createToken:arena-abcd1234-agent-1:write:3600");
 
     expect(await backend.readFile("arena-abcd1234-base", "main", "README.md")).toBe("content:README.md");
-    await backend.cleanupTask("abcd1234");
+    await backend.cleanupTask("abcd1234", [branch]);
     expect(binding.calls).toContain("delete:arena-abcd1234-base");
+  });
+
+  it("tokenText normalizes the real createToken object shape", async () => {
+    expect(ArtifactsGitBackend.tokenText("tok-plain")).toBe("tok-plain");
+    expect(
+      ArtifactsGitBackend.tokenText({ id: "x", plaintext: "art_v2_secret", scope: "write" }),
+    ).toBe("art_v2_secret");
+    expect(() => ArtifactsGitBackend.tokenText({} as never)).toThrow("unrecognized shape");
+  });
+
+  it("fileText normalizes the real readFile object shape", async () => {
+    expect(ArtifactsGitBackend.fileText("plain")).toBe("plain");
+    expect(ArtifactsGitBackend.fileText({ content: "c1" })).toBe("c1");
+    expect(ArtifactsGitBackend.fileText({ text: "c2" })).toBe("c2");
+    expect(ArtifactsGitBackend.fileText(new TextEncoder().encode("c3"))).toBe("c3");
+    expect(() => ArtifactsGitBackend.fileText({ weird: 1 } as never)).toThrow(
+      "keys [weird]",
+    );
   });
 
   it("merge methods fail loudly until the deploy phase wires a merge path", async () => {
