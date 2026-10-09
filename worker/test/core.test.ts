@@ -279,6 +279,48 @@ describe("arena + decide", () => {
     });
     expect(again.status).toBe(409);
   });
+
+  it("(f2) arena UI contract: every field the UI renders is present", async () => {
+    // arena-ui/index.html consumes exactly these shapes; keep them in sync.
+    const { app, taskId } = await arenaTask();
+
+    const arena = await (await app.request(`/task/${taskId}/arena`)).json();
+    expect(typeof arena.task_id).toBe("string");
+    expect(typeof arena.status).toBe("string");
+    for (const c of arena.candidates) {
+      for (const k of ["agent_id", "name", "rationale", "files_touched", "diff_stat"]) {
+        expect(c).toHaveProperty(k);
+      }
+      expect(typeof c.diff_stat.additions).toBe("number");
+      expect(typeof c.diff_stat.deletions).toBe("number");
+    }
+    expect(arena.conflicts.length).toBeGreaterThan(0);
+    for (const k of arena.conflicts) {
+      for (const f of ["path", "a_agent_id", "a_name", "a_excerpt", "b_agent_id", "b_name", "b_excerpt"]) {
+        expect(k).toHaveProperty(f);
+        expect(typeof k[f]).toBe("string");
+      }
+    }
+
+    const task = await (await app.request(`/task/${taskId}`)).json();
+    for (const f of ["id", "brief", "status", "submissions"]) expect(task).toHaveProperty(f);
+    for (const s of task.submissions) {
+      expect(s).toHaveProperty("agent_id");
+      expect(s).toHaveProperty("diff");
+    }
+
+    // decide round-trip: POST {winner_agent_id, decided_by, rationale}
+    const res = await app.request(`/task/${taskId}/decide`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ winner_agent_id: "agent-2", decided_by: "arena-ui", rationale: "casual" }),
+    });
+    expect(res.status).toBe(200);
+    const decided = await (await app.request(`/task/${taskId}`)).json();
+    expect(decided.status).toBe("resolved");
+    expect(decided.result.winner_agent_id).toBe("agent-2");
+    expect(decided.result.winning_diff).toContain("Hey,");
+  });
 });
 
 describe("merge.ts analyzeOverlap (git-independent)", () => {
