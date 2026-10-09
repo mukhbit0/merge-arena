@@ -47,17 +47,16 @@
       "notes": "ACTUALLY RAN (test/demo.test.ts, 21 tests green incl. demo): task created; 3 agents (ada/grace/hopper) submitted CONCURRENTLY via Promise.all \u2014 ada:awaiting_more, grace:auto_merged (disjoint edits), hopper:arena (real git conflict on the greet line). Arena showed merged-so-far (2 candidates) vs hopper. CI push event fed through the real ci-worker queue handler -> run recorded 'received' -> test runner hook flipped to 'passed' with preview URL. Human pick: hopper wins -> resolved. Transcript: demo/TRANSCRIPT.md. Concurrency fixes found by the demo: per-task promise-chain lock on submit/decide (read-modify-write race on task state) + async mutex around LocalGitBackend git ops (shared fixture repo). Honest scope: merge/CI logic ran against real git locally; Artifacts binding + queue delivery need the (blocked) deploy phase."
     },
     "video": {
-      "status": "blocked",
-      "notes": "PREP COMPLETE 2026-10-09 (watchdog run) \u2014 final render NOT done (review gate). Real captures: scripts/capture-server.entry.ts replays the demo against the REAL Hono app (InMemoryState + LocalGitBackend, real git) and serves the REAL arena-ui; scripts/capture-shots.py (Playwright, headless Chromium 1920x1080) captured shot-arena.png (conflict: A=merged-so-far Hi+farewell vs B=hopper Hey \u2014 sides verified via API), shot-ci-received.png, shot-ci-passed.png, shot-decide-before.png, shot-resolved.png (winner agent-3, rationale recorded). scripts/render-terminal.py rendered shot-terminal.mp4 (40s, real transcript). demo/VOICEOVER.md: timed 5:00 narration draft. Side-scare this run: capture-server had a typo (hopper diff said Hi not Hey); product behaved correctly \u2014 identical-change merge conflict is genuine git behavior, not a product bug (verified in /tmp/mergetest). Remaining: TTS voiceover audio + final ffmpeg assembly \u2014 needs USER REVIEW of storyboard + demo first."
+      "status": "in_progress",
+      "notes": "user override 2026-10-09 ~23:39 PKT: do everything, no review gate \u2014 finalize with best judgment"
     },
     "submit": {
       "status": "blocked",
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T23:36:00+05:00",
+  "heartbeat": "2026-10-09T23:39:00+05:00",
   "blockers": [
-    "video: final render needs USER REVIEW of storyboard + demo (prep assets ready in demo/)",
     "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes so POST /task works live; create per-fork artifacts.repo event subscriptions at task-creation time (event-subscription-create command ready)",
     "repo created by user 2026-10-09 ~23:35 PKT; code pushed to origin/master"
   ],
