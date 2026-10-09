@@ -55,20 +55,17 @@
       "notes": "code pushed to origin/master incl. video commit; README run-instructions refreshed; MIT LICENSE in root; submission form researched (cloudflare.com/git-competition/submit, OPEN, deadline Oct 14 11:59 PM PDT); submission copy drafted in goal hidden_files/submission-package.md. USER BLOCKERS: (1) repo is PRIVATE \u2014 user must flip to public in repo settings; (2) terms list US/Canada 18+ eligibility \u2014 his call; (3) form needs his team/contact/attendee details + legal attestations \u2014 cannot be done autonomously."
     }
   },
-  "heartbeat": "2026-10-10T01:10:26+05:00",
+  "heartbeat": "2026-10-10T01:25:00+05:00",
   "blockers": [
     "eligibility: terms list US/Canada residents 18+ \u2014 user in Lahore PK; his call",
-    "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes; per-fork artifacts.repo event subscriptions at task-creation time",
-    "SUBMIT API DOWN (2026-10-10 00:55 PKT): POST /api/git-competition/submissions returns 405 with empty body from both user browser and curl probe (GET=404, OPTIONS=405). Form JS requires turnstileToken on initiation; endpoint rejects regardless. Watchdog probes each run; notify user when it starts accepting POSTs so he can resubmit. Deadline Oct 14."
+    "ARTIFACTS-MODE FOLLOW-UP (partial, 2026-10-10 01:25 PKT): routes wired to ArtifactsGitBackend (task mode local|artifacts, optimistic rev, fork remotes + write tokens; commit 648e470, 32 tests green) \u2014 per-fork artifacts.repo event-subscription creation at task-creation time NOT yet implemented (needs Cloudflare API token in worker; design/security decision, hold for user review)",
+    "SUBMIT API STILL DOWN (re-probed 2026-10-10 01:20 PKT): GET https://www.cloudflare.com/api/git-competition/submissions=404, POST=405, OPTIONS=405. Repo flipped public? unverified (visibility not exposed via SSH). Watchdog probes each run; notify user when it starts accepting POSTs so he can resubmit. Deadline Oct 14."
   ],
-  "active_run": {
-    "started_at": "2026-10-10T01:10:26+05:00",
-    "note": "watchdog 2026-10-10 01:10 PKT run - probing submit API recovery + live worker health"
-  },
+  "active_run": null,
   "watchdog": {
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-10T00:16:15+05:00 watchdog run start"
+    "last_check": "2026-10-10T01:25:00+05:00 watchdog run complete"
   }
 }
