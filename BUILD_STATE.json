@@ -5,21 +5,58 @@
   "decision_gate": "user go/no-go by 2026-10-11 evening; user said GO with full autonomy 2026-10-09",
   "boundaries": {
     "cloudflare_account": "a033f537fb6f4e434bd01b69e99b9e70",
-    "allowed_new": ["worker:merge-arena", "kv:merge-arena-state (new namespace only)"],
-    "forbidden": ["all existing workers (esp. mangaread-api)", "all existing KV namespaces", "all D1 databases", "any other repo"]
+    "allowed_new": [
+      "worker:merge-arena",
+      "kv:merge-arena-state (new namespace only)"
+    ],
+    "forbidden": [
+      "all existing workers (esp. mangaread-api)",
+      "all existing KV namespaces",
+      "all D1 databases",
+      "any other repo"
+    ]
   },
-  "current_phase": "scaffold",
+  "current_phase": "worker-core",
   "phases": {
-    "scaffold": {"status": "in_progress", "notes": "project dirs, state file created 2026-10-09"},
-    "worker-core": {"status": "pending", "notes": "Hono worker: POST /task, per-agent worktree fork, scoped tokens, task briefs"},
-    "artifacts": {"status": "pending", "notes": "Artifacts repo bindings, event subscriptions"},
-    "arena-ui": {"status": "pending", "notes": "live arena view: diffs + rationale + human pick"},
-    "ci": {"status": "pending", "notes": "CI worker (tests) + deploy preview per merged candidate"},
-    "deploy": {"status": "pending", "notes": "deploy merge-arena worker + new KV to Cloudflare (cf.py gated, blanket go for new resources only)"},
-    "demo": {"status": "pending", "notes": "3 agents push in parallel, arena resolves conflict, tests pass, preview deployed"},
-    "video": {"status": "pending", "notes": "demo video assembly — needs user review gate before finalizing"},
-    "submit": {"status": "pending", "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"}
+    "scaffold": {
+      "status": "done",
+      "notes": "scaffold committed (a74bf89): worker skeleton (Hono TS, health + stub POST /task), arena-ui placeholder, ci-worker README, main README, .gitignore; npm install ok (62 pkgs), tsc clean, wrangler.toml valid; no deploy in this phase"
+    },
+    "worker-core": {
+      "status": "pending",
+      "notes": "Hono worker: POST /task, per-agent worktree fork, scoped tokens, task briefs"
+    },
+    "artifacts": {
+      "status": "pending",
+      "notes": "Artifacts repo bindings, event subscriptions"
+    },
+    "arena-ui": {
+      "status": "pending",
+      "notes": "live arena view: diffs + rationale + human pick"
+    },
+    "ci": {
+      "status": "pending",
+      "notes": "CI worker (tests) + deploy preview per merged candidate"
+    },
+    "deploy": {
+      "status": "pending",
+      "notes": "deploy merge-arena worker + new KV to Cloudflare (cf.py gated, blanket go for new resources only)"
+    },
+    "demo": {
+      "status": "pending",
+      "notes": "3 agents push in parallel, arena resolves conflict, tests pass, preview deployed"
+    },
+    "video": {
+      "status": "pending",
+      "notes": "demo video assembly \u2014 needs user review gate before finalizing"
+    },
+    "submit": {
+      "status": "pending",
+      "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
+    }
   },
-  "heartbeat": "2026-10-09T19:59:00+05:00",
-  "blockers": ["github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"]
+  "heartbeat": "2026-10-09T20:04:42+05:00",
+  "blockers": [
+    "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"
+  ]
 }
