@@ -321,6 +321,50 @@ describe("arena + decide", () => {
     expect(decided.result.winner_agent_id).toBe("agent-2");
     expect(decided.result.winning_diff).toContain("Hey,");
   });
+
+  it("(g) GET /task/:id/ci lists CI runs; POST flips status + preview_url", async () => {
+    const git = new LocalGitBackend();
+    backends.push(git);
+    const state = new InMemoryState();
+    const app = createApp(() => ({ state, git, secret: "test-secret" }));
+    const created = await createTask(app);
+    const taskId = created.task_id;
+    await state.put(`ci:${taskId}:def789`, {
+      task_id: taskId, repo: `arena-${taskId}-agent-1`, ref: "refs/heads/main",
+      sha: "def789", commit_count: 1, commit_messages: ["work"], status: "received",
+      received_at: "2026-10-09T00:00:00Z",
+    });
+    await state.put(`ci:${taskId}:latest`, "def789");
+
+    const list = await (await app.request(`/task/${taskId}/ci`)).json();
+    expect(list.task_id).toBe(taskId);
+    expect(list.runs).toHaveLength(1);
+    expect(list.runs[0].status).toBe("received");
+    expect(list.runs[0].sha).toBe("def789");
+
+    const bad = await app.request(`/task/${taskId}/ci/def789`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "bogus" }),
+    });
+    expect(bad.status).toBe(400);
+
+    const ok = await app.request(`/task/${taskId}/ci/def789`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "passed", preview_url: "https://preview.example/r1" }),
+    });
+    expect(ok.status).toBe(200);
+    const relist = await (await app.request(`/task/${taskId}/ci`)).json();
+    expect(relist.runs[0].status).toBe("passed");
+    expect(relist.runs[0].preview_url).toBe("https://preview.example/r1");
+
+    const missing = await app.request(`/task/${taskId}/ci/nonexistent`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "failed" }),
+    });
+    expect(missing.status).toBe(404);
+    const noTask = await app.request("/task/nope/ci");
+    expect(noTask.status).toBe(404);
+  });
 });
 
 describe("merge.ts analyzeOverlap (git-independent)", () => {

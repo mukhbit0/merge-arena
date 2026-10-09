@@ -92,11 +92,12 @@
   async function refresh() {
     if (!taskId) return;
     try {
-      const [task, arena] = await Promise.all([
+      const [task, arena, ci] = await Promise.all([
         fetchJSON(api(`/task/${taskId}`)),
         fetchJSON(api(`/task/${taskId}/arena`)),
+        fetchJSON(api(`/task/${taskId}/ci`)).catch(() => ({ runs: [] })),
       ]);
-      render(task, arena);
+      render(task, arena, ci);
       $("conn").textContent = "live";
       $("conn").style.color = "#7ee787";
     } catch (e) {
@@ -105,7 +106,7 @@
     }
   }
 
-  function render(task, arena) {
+  function render(task, arena, ci) {
     const el = $("app");
     const badge = `<span class="badge ${esc(task.status)}">${esc(task.status)}</span>`;
     let html = `<div class="brief"><h2>Task ${esc(task.id)} ${badge}</h2><p>${esc(task.brief || "")}</p></div>`;
@@ -135,6 +136,22 @@
           <div class="side b"><div class="who">B — ${esc(k.b_name)}</div><pre>${esc(k.b_excerpt)}</pre></div>
         </div></div>`;
       }
+    }
+
+    // CI runs (from the merge-arena-ci queue consumer)
+    const runs = (ci && ci.runs) || [];
+    if (runs.length) {
+      const dot = { received: "#58a6ff", running: "#bb8009", passed: "#7ee787", failed: "#f85149" };
+      html += `<h2>CI runs (${runs.length})</h2><div class="card"><table style="width:100%;font-size:.85rem;border-collapse:collapse">`;
+      html += `<tr style="color:#8b949e;text-align:left"><th>repo</th><th>ref</th><th>sha</th><th>status</th><th>preview</th></tr>`;
+      for (const r of runs) {
+        const c0 = dot[r.status] || "#8b949e";
+        html += `<tr style="border-top:1px solid #30363d"><td>${esc(r.repo)}</td><td>${esc(String(r.ref).replace("refs/heads/", ""))}</td>`
+          + `<td><span class="meta">${esc(String(r.sha).slice(0, 8))}</span></td>`
+          + `<td><span style="color:${c0};font-weight:700">${esc(r.status)}</span></td>`
+          + `<td>${r.preview_url ? `<a href="${esc(r.preview_url)}" target="_blank" rel="noopener" style="color:#58a6ff">preview</a>` : "—"}</td></tr>`;
+      }
+      html += `</table></div>`;
     }
 
     // Human pick control

@@ -71,6 +71,8 @@ export function createApp(resolve: (env: Env) => Deps = getDeps) {
         "POST /task/:id/submit",
         "GET /task/:id/arena",
         "POST /task/:id/decide",
+        "GET /task/:id/ci",
+        "POST /task/:id/ci/:sha",
       ],
     }),
   );
@@ -285,6 +287,41 @@ export function createApp(resolve: (env: Env) => Deps = getDeps) {
     };
     await deps.state.put(taskKey(id), task);
     return c.json({ status: "resolved", task_id: id, winner_agent_id: winning.agent_id });
+  });
+
+  // --- CI runs (written by the merge-arena-ci queue consumer) ----------------
+
+  app.get("/task/:id/ci", async (c) => {
+    const deps = c.get("deps");
+    const id = c.req.param("id");
+    const task = await deps.state.get<TaskRecord>(taskKey(id));
+    if (!task) return c.json({ error: "task not found" }, 404);
+    const runs: Array<Record<string, unknown>> = [];
+    for (const k of await deps.state.list(`ci:${id}:`)) {
+      if (k.endsWith(":latest")) continue;
+      const r = await deps.state.get<Record<string, unknown>>(k);
+      if (r) runs.push(r);
+    }
+    runs.sort((a, b) => String(b.received_at ?? "").localeCompare(String(a.received_at ?? "")));
+    return c.json({ task_id: id, runs });
+  });
+
+  // CI runner reports back on a run recorded from a push event.
+  app.post("/task/:id/ci/:sha", async (c) => {
+    const deps = c.get("deps");
+    const id = c.req.param("id");
+    const sha = c.req.param("sha");
+    const key = `ci:${id}:${sha}`;
+    const rec = await deps.state.get<Record<string, unknown>>(key);
+    if (!rec) return c.json({ error: "ci run not found" }, 404);
+    const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+    if (!["running", "passed", "failed"].includes(String(body.status))) {
+      return c.json({ error: "status must be one of running|passed|failed" }, 400);
+    }
+    rec.status = body.status;
+    if (typeof body.preview_url === "string") rec.preview_url = body.preview_url;
+    await deps.state.put(key, rec);
+    return c.json({ ok: true, task_id: id, sha, status: rec.status });
   });
 
   return app;

@@ -1,0 +1,20 @@
+# Merge Arena CI worker — NEW worker only. Never reuse bindings from existing workers.
+# Deployed in the deploy phase via the gated flow; until then these are docs.
+
+name = "merge-arena-ci"
+main = "src/index.ts"
+compatibility_date = "2026-10-09"
+
+[vars]
+CI_NAMESPACE = "merge-arena"
+
+# Queue consumer — deploy phase only (queue + event subscription are new resources):
+# [[queues.consumers]]
+# queue = "merge-arena-events"
+# max_batch_size = 20
+# max_retries = 3
+
+# STATE_KV is shared with the merge-arena worker (same new KV namespace):
+# [[kv_namespaces]]
+# binding = "STATE_KV"
+# id = "<new namespace id for merge-arena-state>"

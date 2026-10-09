@@ -16,7 +16,7 @@
       "any other repo"
     ]
   },
-  "current_phase": "arena-ui",
+  "current_phase": "ci",
   "phases": {
     "scaffold": {
       "status": "done",
@@ -31,8 +31,8 @@
       "notes": "ArtifactsGitBackend (baseline repo per task + per-agent forks + short-lived write tokens + readFile/log). ADDED this run: mergePreview() \u2014 read-only 3-ref merge preview via readFile + pure merge.ts (paths from submission files_touched; binding has no file listing), 2 new tests (18 green, tsc clean). Event subscription shape VERIFIED against official events-schemas docs: delivered to Workers Queues, sources `artifacts` / `artifacts.repo`, event cf.artifacts.repo.pushed; there is NO [[events]] wrangler block (wrangler.toml comments corrected). Workers Paid plan CONFIRMED active on account. Research doc written to hidden_files/artifacts-research.md. threeWay/adoptMerge on raw repos still deliberately unimplemented (Worker has no commit path; merge lands via winning-fork push or orchestrator git merge with minted token \u2014 deploy/demo phase)."
     },
     "arena-ui": {
-      "status": "pending",
-      "notes": "live arena view: diffs + rationale + human pick"
+      "status": "done",
+      "notes": "Single-file static arena-ui/index.html: task loader (?task=/?api= deep links), 3s auto-refresh, status badge, candidates with rationale + files + diff stat + full tinted diffs, side-by-side conflict excerpts (merged-so-far vs newcomer), human-pick decide control (radio + rationale -> POST /decide), resolved/merged result view. JS syntax-checked; API contract test (f2) added and caught a real field-name bug (diff_stat.additions/deletions). 19 tests green, tsc clean."
     },
     "ci": {
       "status": "pending",
@@ -55,7 +55,7 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T21:10:15+05:00",
+  "heartbeat": "2026-10-09T21:16:00+05:00",
   "blockers": [
     "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"
   ],
