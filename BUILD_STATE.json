@@ -55,12 +55,15 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T23:39:00+05:00",
+  "heartbeat": "2026-10-09T18:39:55+05:00",
   "blockers": [
     "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes so POST /task works live; create per-fork artifacts.repo event subscriptions at task-creation time (event-subscription-create command ready)",
     "repo created by user 2026-10-09 ~23:35 PKT; code pushed to origin/master"
   ],
-  "active_run": null,
+  "active_run": {
+    "started_at": "2026-10-09T18:39:55+05:00",
+    "note": "watchdog run 23:39 PKT: video finalize + submit"
+  },
   "watchdog": {
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",

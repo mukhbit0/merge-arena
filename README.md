@@ -47,15 +47,34 @@ a deploy preview automatically.
 - **ci-worker/** — subscribes to merge events; runs tests and builds a deploy
   preview per merged candidate.
 
-## Run instructions (local dev)
+## Run instructions
+
+Local (Node 20+):
 
 ```bash
 cd worker
 npm install
-npm run dev        # wrangler dev on http://localhost:8787
-curl localhost:8787/                 # health check
-curl -X POST localhost:8787/task     # 501 until worker-core phase lands
+npm test                      # 21 tests incl. the 3-agent concurrent demo
+npm run typecheck              # tsc --noEmit
+npm run dev                    # wrangler dev on http://localhost:8787
 ```
+
+Try it:
+
+```bash
+curl -s localhost:8787/health
+curl -s -X POST localhost:8787/task -H 'content-type: application/json' \
+  -d '{"brief":"Add a greeting helper","baseline":{"files":{"app.ts":"export function greet(){return \"Hi\";}"}}}'
+# -> {"id":"<taskId>","tokens":{...}}  (per-agent fork tokens)
+# open arena-ui/index.html?api=http://localhost:8787&task=<taskId> for the live arena view
+```
+
+Live deployment: https://merge-arena.ionicerrrrscode.workers.dev
+(Cloudflare Workers + KV + Queues; `GET /health` for a smoke check)
+
+Note: `POST /task` runs the full git-backed merge locally. On the live
+Worker it returns 500 by design — workerd has no git; the Artifacts-backed
+backend is the planned production path (see BUILD_STATE.json blockers).
 
 ## Competition entry
 
