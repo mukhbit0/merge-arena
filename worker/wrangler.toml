@@ -40,4 +40,4 @@ namespace = "merge-arena"
 # KV binding — deploy phase only, via cf.py gated flow (new namespace only):
 # [[kv_namespaces]]
 # binding = "STATE_KV"
-# id = "<new namespace id for merge-arena-state>"
+# id = "81fd5d77354e4f58a9bc4f91fe8a8685"

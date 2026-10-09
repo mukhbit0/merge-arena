@@ -17,4 +17,4 @@ CI_NAMESPACE = "merge-arena"
 # STATE_KV is shared with the merge-arena worker (same new KV namespace):
 # [[kv_namespaces]]
 # binding = "STATE_KV"
-# id = "<new namespace id for merge-arena-state>"
+# id = "81fd5d77354e4f58a9bc4f91fe8a8685"
