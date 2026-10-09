@@ -7,7 +7,7 @@
 // swap LocalGitBackend for an Artifacts-backed git backend — routes stay the
 // same because they only talk to the Deps interfaces.
 
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { getState } from "./storage";
 import { LocalGitBackend, defaultFixtureFiles, type GitBackend } from "./git-backend";
 import { ArtifactsGitBackend, type ArtifactsBindingLike } from "./artifacts-git";
@@ -18,6 +18,19 @@ import type { Deps, Env, TaskRecord, AgentBrief, Submission, StoredConflict } fr
 const taskKey = (id: string) => `task:${id}`;
 const TOKEN_TTL_MS = 7 * 24 * 3600 * 1000;
 const MAX_AGENTS = 8;
+
+type AppContext = Context<{ Bindings: Env; Variables: { deps: Deps } }>;
+
+const taskLocks = new Map<string, Promise<void>>();
+function withTaskLock<T>(taskId: string, fn: () => Promise<T>): Promise<T> {
+  const prev = taskLocks.get(taskId) ?? Promise.resolve();
+  let release!: () => void;
+  const cur = new Promise<void>((res) => {
+    release = res;
+  });
+  taskLocks.set(taskId, prev.then(() => cur));
+  return prev.then(fn).finally(() => release());
+}
 
 let gitSingleton: GitBackend | null = null;
 function defaultGit(): GitBackend {
@@ -139,8 +152,12 @@ export function createApp(resolve: (env: Env) => Deps = getDeps) {
   // --- Submissions ----------------------------------------------------------
 
   app.post("/task/:id/submit", async (c) => {
-    const deps = c.get("deps");
     const id = c.req.param("id");
+    return withTaskLock(id, () => submitInner(c, id));
+  });
+
+  async function submitInner(c: AppContext, id: string) {
+    const deps = c.get("deps");
     const task = await deps.state.get<TaskRecord>(taskKey(id));
     if (!task) return c.json({ error: "task not found" }, 404);
     if (task.status !== "collecting") {
@@ -233,7 +250,7 @@ export function createApp(resolve: (env: Env) => Deps = getDeps) {
       task_id: id,
       conflicts: conflicts.map((k) => ({ path: k.path })),
     });
-  });
+  }
 
   // --- Arena view + human decision --------------------------------------------
 
@@ -266,8 +283,12 @@ export function createApp(resolve: (env: Env) => Deps = getDeps) {
   });
 
   app.post("/task/:id/decide", async (c) => {
-    const deps = c.get("deps");
     const id = c.req.param("id");
+    return withTaskLock(id, () => decideInner(c, id));
+  });
+
+  async function decideInner(c: AppContext, id: string) {
+    const deps = c.get("deps");
     const task = await deps.state.get<TaskRecord>(taskKey(id));
     if (!task) return c.json({ error: "task not found" }, 404);
     if (task.status !== "arena") {
@@ -287,7 +308,7 @@ export function createApp(resolve: (env: Env) => Deps = getDeps) {
     };
     await deps.state.put(taskKey(id), task);
     return c.json({ status: "resolved", task_id: id, winner_agent_id: winning.agent_id });
-  });
+  }
 
   // --- CI runs (written by the merge-arena-ci queue consumer) ----------------
 

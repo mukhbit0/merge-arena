@@ -62,6 +62,20 @@ export class LocalGitBackend implements GitBackend {
   private tasks = new Map<string, { repoDir: string; baseRef: string }>();
   private branchTask = new Map<string, string>();
   private dirs = new Set<string>();
+  // Serializes git operations: agents submit concurrently, but each task's
+  // fixture repo is a single git dir — concurrent checkout/apply/commit
+  // would race on the index. (Production uses the Artifacts backend, where
+  // locking is server-side.)
+  private queue: Promise<void> = Promise.resolve();
+
+  private locked<T>(fn: () => Promise<T> | T): Promise<T> {
+    const run = this.queue.then(fn);
+    this.queue = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
+  }
 
   /** LocalGitBackend shells out to git — it only runs under Node.js (tests,
    *  local scripts). The deployed Worker gets an Artifacts-backed backend in
@@ -137,6 +151,10 @@ export class LocalGitBackend implements GitBackend {
   }
 
   async applyDiff(branch: string, unifiedDiff: string): Promise<void> {
+    return this.locked(() => this.applyDiffInner(branch, unifiedDiff));
+  }
+
+  private applyDiffInner(branch: string, unifiedDiff: string): void {
     const dir = this.repoDirFor(branch);
     this.must(dir, ["checkout", "-q", branch], `checkout ${branch}`);
     const r = this.git(dir, ["apply", "--whitespace=fix", "-"], unifiedDiff);
@@ -152,6 +170,10 @@ export class LocalGitBackend implements GitBackend {
   }
 
   async threeWay(base: string, a: string, b: string): Promise<ThreeWayResult> {
+    return this.locked(() => this.threeWayInner(base, a, b));
+  }
+
+  private threeWayInner(base: string, a: string, b: string): ThreeWayResult {
     let dir: string;
     try {
       dir = this.repoDirFor(b);
@@ -171,6 +193,10 @@ export class LocalGitBackend implements GitBackend {
   }
 
   async adoptMerge(base: string, candidateBranch: string, mergeBranch: string): Promise<ThreeWayResult> {
+    return this.locked(() => this.adoptMergeInner(base, candidateBranch, mergeBranch));
+  }
+
+  private adoptMergeInner(base: string, candidateBranch: string, mergeBranch: string): ThreeWayResult {
     const dir = this.repoDirFor(mergeBranch);
     this.must(dir, ["checkout", "-q", mergeBranch], `checkout ${mergeBranch}`);
     return this.mergeInto(dir, base, candidateBranch, mergeBranch);
