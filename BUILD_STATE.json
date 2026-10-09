@@ -55,7 +55,7 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T23:19:24.895678+05:00",
+  "heartbeat": "2026-10-09T23:26:53.217641+05:00",
   "blockers": [
     "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase",
     "video: final render needs USER REVIEW of storyboard + demo (prep assets ready in demo/)",
@@ -65,6 +65,7 @@
   "watchdog": {
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
-    "claim_ttl_min": 45
+    "claim_ttl_min": 45,
+    "last_check": "2026-10-09T23:26PKT watchdog: no unblocking change (repo still absent, video still review-gated); worker /health 200"
   }
 }
