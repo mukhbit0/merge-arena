@@ -55,8 +55,17 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T20:04:42+05:00",
+  "heartbeat": "2026-10-09T20:25:36+05:00",
   "blockers": [
     "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"
-  ]
+  ],
+  "active_run": {
+    "started_at": "2026-10-09T20:25:36+05:00",
+    "note": "watchdog merge-arena-watchdog 2026-10-09 20:25 tick: worker-core inner loop"
+  },
+  "watchdog": {
+    "interval": "15m",
+    "inner_loop": "retry immediately within run, max 3 attempts per step",
+    "claim_ttl_min": 45
+  }
 }
