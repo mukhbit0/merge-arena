@@ -55,11 +55,11 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T23:26:53.217641+05:00",
+  "heartbeat": "2026-10-09T23:36:00+05:00",
   "blockers": [
-    "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase",
     "video: final render needs USER REVIEW of storyboard + demo (prep assets ready in demo/)",
-    "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes so POST /task works live; create per-fork artifacts.repo event subscriptions at task-creation time (event-subscription-create command ready)"
+    "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes so POST /task works live; create per-fork artifacts.repo event subscriptions at task-creation time (event-subscription-create command ready)",
+    "repo created by user 2026-10-09 ~23:35 PKT; code pushed to origin/master"
   ],
   "active_run": null,
   "watchdog": {
