@@ -47,23 +47,20 @@
       "notes": "ACTUALLY RAN (test/demo.test.ts, 21 tests green incl. demo): task created; 3 agents (ada/grace/hopper) submitted CONCURRENTLY via Promise.all \u2014 ada:awaiting_more, grace:auto_merged (disjoint edits), hopper:arena (real git conflict on the greet line). Arena showed merged-so-far (2 candidates) vs hopper. CI push event fed through the real ci-worker queue handler -> run recorded 'received' -> test runner hook flipped to 'passed' with preview URL. Human pick: hopper wins -> resolved. Transcript: demo/TRANSCRIPT.md. Concurrency fixes found by the demo: per-task promise-chain lock on submit/decide (read-modify-write race on task state) + async mutex around LocalGitBackend git ops (shared fixture repo). Honest scope: merge/CI logic ran against real git locally; Artifacts binding + queue delivery need the (blocked) deploy phase."
     },
     "video": {
-      "status": "pending",
-      "notes": "demo video assembly \u2014 needs user review gate before finalizing"
+      "status": "in_progress",
+      "notes": "PREP ONLY \u2014 not finalized (review gate). demo/STORYBOARD.md: 7-shot 5-min plan (title, architecture, concurrent-push terminal capture, arena UI live, CI runs, human pick, outro). demo/render-draft.sh renders title cards via ffmpeg; demo/draft.mp4 (12s, 3 cards, DRAFT watermark) verified frame-by-frame. Remaining: screen captures of arena UI + terminal, voiceover, final render \u2014 all blocked on USER REVIEW of storyboard + demo."
     },
     "submit": {
       "status": "pending",
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T21:30:01+05:00",
+  "heartbeat": "2026-10-09T21:31:53+05:00",
   "blockers": [
     "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase",
     "deploy: cf.py lacks worker-deploy and kv-namespace-create \u2014 merge-arena worker/KV/queue cannot be created via the mandated gated flow (see deploy phase notes)"
   ],
-  "active_run": {
-    "started_at": "2026-10-09T21:04:25+05:00",
-    "note": "watchdog run 2026-10-09 20:55 tick, continue artifacts phase"
-  },
+  "active_run": null,
   "watchdog": {
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
