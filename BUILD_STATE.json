@@ -55,7 +55,7 @@
       "notes": "code pushed to origin/main (37 commits, HEAD c588aa9, in sync); README run-instructions refreshed; MIT LICENSE in root; submission form researched (cloudflare.com/git-competition/submit, OPEN, deadline Oct 14 11:59 PM PDT, form requires team/contact/attendee details + demo video upload + 'built with Workers+Artifacts' attestation); submission copy drafted in goal hidden_files/submission-package.md. 2026-10-10 ~01:30 PKT: REPO IS NOW PUBLIC (mukhbit0/merge-arena, main, MIT, 37 commits) \u2014 user flipped it. USER BLOCKERS REMAINING: (1) terms list US/Canada 18+ eligibility \u2014 his call; (2) form needs his team/contact/attendee details + video upload + legal attestations \u2014 cannot be done autonomously."
     }
   },
-  "heartbeat": "2026-10-10T04:26:10+05:00",
+  "heartbeat": "2026-10-10T04:41:41+05:00",
   "blockers": [
     "eligibility: terms list US/Canada residents 18+ \u2014 user in Lahore PK; his call",
     "ARTIFACTS-MODE FOLLOW-UP (partial, 2026-10-10 01:25 PKT): routes wired to ArtifactsGitBackend (task mode local|artifacts, optimistic rev, fork remotes + write tokens; commit 648e470, 32 tests green) \u2014 per-fork artifacts.repo event-subscription creation at task-creation time NOT yet implemented (needs Cloudflare API token in worker; design/security decision, hold for user review)",
@@ -66,7 +66,7 @@
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-10T04:25 PKT watchdog run: submit API still down (GET 404 / POST 405 / OPTIONS 405 / HEAD 404); submit form page live (301->200, 'Submit your project | Cloudflare Challenge'); worker /health 200; local==origin/main (0/0)"
+    "last_check": "2026-10-10T04:41 PKT watchdog run: submit API still down (GET 404 / POST 405 / OPTIONS 405 / HEAD 404); submit form page live (200, 'Submit your project | Cloudflare Challenge'); worker /health 200 {\"ok\":true}; local==origin/main (45a45fe); user blockers unchanged"
   },
   "submit": {
     "status": "blocked",
