@@ -109,7 +109,7 @@ ffmpeg -y -v error \
 
 # Duck the music bed under each narration window (0.5s padding each side)
 # instead of sidechaincompress — deterministic, no shared-stream quirks.
-DUCK="'if(between(t,4.3,15.7)+between(t,27.3,42.7)+between(t,66.6,83.4)+between(t,161.5,178.5)+between(t,223.4,236.6)+between(t,264.9,275.1)+between(t,275.0,285.0),0.05,0.12)'"
+DUCK="'if(between(t,4.3,15.7)+between(t,27.3,42.7)+between(t,66.6,83.4)+between(t,161.5,178.5)+between(t,223.4,236.6)+between(t,264.9,275.1)+between(t,275.0,285.0),0.02,0.05)'"
 ffmpeg -y -v error -i work/narr.wav -stream_loop 1 -i "$MUSIC" \
   -filter_complex "\
 [1:a]aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=0:300,afade=t=in:st=0:d=3,afade=t=out:st=297:d=3,volume=$DUCK:eval=frame[music];\
