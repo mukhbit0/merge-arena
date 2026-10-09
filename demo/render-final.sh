@@ -86,7 +86,7 @@ printf "file '%s'\n" "$PWD/work/seg1.mp4" "$PWD/work/seg2.mp4" "$PWD/work/seg3.m
 ffmpeg -y -v error -f concat -safe 0 -i work/concat.txt -c copy work/video.mp4
 
 # --- audio: narration centered in each shot + music bed ducked under speech ---
-# narration offsets (ms) = cum_shot_start + (shot_dur - narr_dur)/2
+# narration offsets (ms) = shot_start + 500ms lead-in (narration starts WITH each shot)
 # shot starts: 0, 20, 50, 130, 210, 250, 260 (20/30/50/80/40/40/40 = 300s)
 #
 # Two-step build (deliberate): a single filtergraph that feeds one stream into
@@ -97,13 +97,13 @@ ffmpeg -y -v error \
   -i audio/shot-1.mp3 -i audio/shot-2.mp3 -i audio/shot-3.mp3 -i audio/shot-4.mp3 \
   -i audio/shot-5.mp3 -i audio/shot-6.mp3 -i audio/shot-7.mp3 \
   -filter_complex "\
-[0:a]adelay=4830|4830[a1];\
-[1:a]adelay=27850|27850[a2];\
-[2:a]adelay=67090|67090[a3];\
-[3:a]adelay=162020|162020[a4];\
-[4:a]adelay=223920|223920[a5];\
-[5:a]adelay=265390|265390[a6];\
-[6:a]adelay=275500|275500[a7];\
+[0:a]adelay=500|500[a1];\
+[1:a]adelay=20500|20500[a2];\
+[2:a]adelay=50500|50500[a3];\
+[3:a]adelay=130500|130500[a4];\
+[4:a]adelay=210500|210500[a5];\
+[5:a]adelay=250500|250500[a6];\
+[6:a]adelay=260500|260500[a7];\
 [a1][a2][a3][a4][a5][a6][a7]amix=inputs=7:normalize=0,apad=whole_dur=300,aformat=channel_layouts=stereo[narr]" \
   -map "[narr]" -c:a pcm_s16le -ar 48000 -t 300 work/narr.wav
 
