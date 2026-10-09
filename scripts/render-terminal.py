@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """Render demo/shot-terminal.mp4 — the real demo test transcript as a
 scrolling terminal capture (1920x1080, 40s). PREP asset, DRAFT watermark.
-Usage: python3 scripts/render-terminal.py  (run from repo root)
+Usage: python3 scripts/render-terminal.py [--final]  (run from repo root)
+  --final  omit the "DRAFT — not final" watermark (for the final demo video)
 """
+import argparse
 import subprocess, sys
 from PIL import Image, ImageDraw, ImageFont
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--final", action="store_true",
+                help="omit the DRAFT watermark (final video asset)")
+args = ap.parse_args()
 
 W, H = 1920, 1080
 FPS = 30
@@ -69,15 +76,16 @@ for i, (cx, cy, col) in enumerate([(40, 32, (255, 95, 86)), (68, 32, (255, 189, 
 d.text((140, 16), "demo — 3 agents push concurrently  ·  merge-arena", font=FONT_TITLE, fill=DIM)
 for i, (text, color, font) in enumerate(LINES):
     d.text((PAD, BAR_H + PAD + i * LH), text, font=font, fill=color)
-# DRAFT watermark on every visible frame region
+# DRAFT watermark on every visible frame region (skipped with --final)
 img.save("/tmp/terminal-tall.png")
 
 scroll = tall_h - H  # px to travel
-vf = (
-    f"crop=1920:1080:0:'if(lt(t,{DUR_SCROLL}), {scroll}*t/{DUR_SCROLL}, {scroll})',"
-    "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-    ":text='DRAFT — not final':fontcolor=0xbb8009:fontsize=28:x=40:y=h-80"
-)
+vf = f"crop=1920:1080:0:'if(lt(t,{DUR_SCROLL}), {scroll}*t/{DUR_SCROLL}, {scroll})'"
+if not args.final:
+    vf += (
+        ",drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        ":text='DRAFT — not final':fontcolor=0xbb8009:fontsize=28:x=40:y=h-80"
+    )
 subprocess.run([
     "ffmpeg", "-y", "-v", "error", "-loop", "1", "-i", "/tmp/terminal-tall.png",
     "-vf", vf, "-t", str(DUR_SCROLL + DUR_HOLD), "-r", str(FPS), "-pix_fmt", "yuv420p",

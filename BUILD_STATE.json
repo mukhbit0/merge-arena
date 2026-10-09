@@ -51,14 +51,16 @@
       "notes": "user override 2026-10-09 ~23:39 PKT: do everything, no review gate \u2014 finalize with best judgment"
     },
     "submit": {
-      "status": "blocked",
-      "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
+      "status": "in_progress",
+      "notes": "code pushed to origin/master (0373e1a); README run-instructions refreshed; submission form researched (cloudflare.com/git-competition/submit, open until Oct 14 11:59 PM PDT); submission copy drafted in goal hidden_files; video final render still running (subagent)"
     }
   },
-  "heartbeat": "2026-10-09T18:39:55+05:00",
+  "heartbeat": "2026-10-09T18:53:54+05:00",
   "blockers": [
-    "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes so POST /task works live; create per-fork artifacts.repo event subscriptions at task-creation time (event-subscription-create command ready)",
-    "repo created by user 2026-10-09 ~23:35 PKT; code pushed to origin/master"
+    "repo visibility: mukhbit0/merge-arena is PRIVATE (API 404, SSH ok) \u2014 needs user to flip to public in repo settings",
+    "eligibility: terms list US/Canada residents 18+ \u2014 user in Lahore PK; his call",
+    "submission form needs his details: team name/contact/location, attendee name(s)/email(s), plus his legal attestations",
+    "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes; per-fork artifacts.repo event subscriptions at task-creation time"
   ],
   "active_run": {
     "started_at": "2026-10-09T18:39:55+05:00",
@@ -68,6 +70,6 @@
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-09T23:26PKT watchdog: no unblocking change (repo still absent, video still review-gated); worker /health 200"
+    "last_check": "2026-10-09 23:5x PKT watchdog: video finalizing, form submission pending user (private repo, eligibility, form fields)"
   }
 }
