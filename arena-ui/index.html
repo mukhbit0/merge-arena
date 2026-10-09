@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Merge Arena — live</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 2rem; background: #0b0e14; color: #e6edf3; max-width: 1200px; }
+    header { margin-bottom: 1.5rem; }
+    h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
+    p.sub { color: #8b949e; margin: 0 0 1rem; }
+    .controls { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+    input[type=text] { background: #161b22; border: 1px solid #30363d; color: #e6edf3; border-radius: 6px; padding: .5rem .75rem; }
+    #taskId { width: 10rem; }
+    #apiBase { width: 22rem; }
+    button { background: #238636; color: #fff; border: 0; border-radius: 6px; padding: .5rem 1rem; cursor: pointer; font-weight: 600; }
+    button:disabled { background: #30363d; cursor: default; }
+    button.ghost { background: #161b22; border: 1px solid #30363d; }
+    .badge { display: inline-block; padding: .2rem .7rem; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+    .badge.collecting { background: #1f6feb; }
+    .badge.arena { background: #bb8009; }
+    .badge.merged, .badge.resolved { background: #238636; }
+    .brief { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .brief h2 { margin: 0 0 .5rem; font-size: 1.1rem; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; }
+    .card h3 { margin: 0 0 .25rem; font-size: 1rem; }
+    .card .meta { color: #8b949e; font-size: .8rem; margin-bottom: .5rem; }
+    .card .rationale { font-style: italic; color: #c9d1d9; margin-bottom: .5rem; }
+    details.diff { margin-top: .5rem; }
+    details.diff summary { cursor: pointer; color: #58a6ff; font-size: .85rem; }
+    pre { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: .75rem; overflow-x: auto; font-size: .75rem; line-height: 1.45; margin: .5rem 0 0; white-space: pre-wrap; }
+    .add { color: #7ee787; } .del { color: #ffa198; } .hunk { color: #79c0ff; }
+    .conflict { border: 1px solid #bb8009; border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+    .conflict .path { background: #2d1f04; padding: .5rem 1rem; font-family: monospace; font-weight: 700; }
+    .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .side { padding: 1rem; }
+    .side.a { border-right: 1px solid #30363d; }
+    .side .who { font-weight: 700; margin-bottom: .5rem; }
+    .decide { background: #161b22; border: 1px solid #bb8009; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .decide label.opt { display: block; padding: .4rem 0; cursor: pointer; }
+    .decide textarea { width: 100%; box-sizing: border-box; background: #0d1117; border: 1px solid #30363d; color: #e6edf3; border-radius: 6px; padding: .5rem; margin: .5rem 0; min-height: 3rem; }
+    .error { background: #3d1113; border: 1px solid #f85149; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .poll { color: #8b949e; font-size: .8rem; }
+    @media (max-width: 700px) { .sides { grid-template-columns: 1fr; } .side.a { border-right: 0; border-bottom: 1px solid #30363d; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Merge Arena</h1>
+    <p class="sub">Agent-native merge queue — when agents conflict, a human picks the winner.</p>
+    <div class="controls">
+      <input id="apiBase" type="text" placeholder="API base (default: same origin)" />
+      <input id="taskId" type="text" placeholder="task id" />
+      <button id="loadBtn">Load</button>
+      <label class="poll"><input id="auto" type="checkbox" checked /> auto-refresh (3s)</label>
+      <span id="conn"></span>
+    </div>
+  </header>
+
+  <div id="app"><p class="sub">Enter a task id to watch it live.</p></div>
+
+  <script>
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  function api(path) {
+    const base = ($("apiBase").value || "").trim().replace(/\/$/, "");
+    return base + path;
+  }
+
+  function tintDiff(diff) {
+    return esc(diff).split("\n").map((line) => {
+      if (line.startsWith("+") && !line.startsWith("+++")) return `<span class="add">${line}</span>`;
+      if (line.startsWith("-") && !line.startsWith("---")) return `<span class="del">${line}</span>`;
+      if (line.startsWith("@@")) return `<span class="hunk">${line}</span>`;
+      return line;
+    }).join("\n");
+  }
+
+  async function fetchJSON(url, opts) {
+    const res = await fetch(url, opts);
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+    return body;
+  }
+
+  let taskId = null, timer = null;
+
+  async function refresh() {
+    if (!taskId) return;
+    try {
+      const [task, arena, ci] = await Promise.all([
+        fetchJSON(api(`/task/${taskId}`)),
+        fetchJSON(api(`/task/${taskId}/arena`)),
+        fetchJSON(api(`/task/${taskId}/ci`)).catch(() => ({ runs: [] })),
+      ]);
+      render(task, arena, ci);
+      $("conn").textContent = "live";
+      $("conn").style.color = "#7ee787";
+    } catch (e) {
+      $("conn").textContent = "error: " + e.message;
+      $("conn").style.color = "#f85149";
+    }
+  }
+
+  function render(task, arena, ci) {
+    const el = $("app");
+    const badge = `<span class="badge ${esc(task.status)}">${esc(task.status)}</span>`;
+    let html = `<div class="brief"><h2>Task ${esc(task.id)} ${badge}</h2><p>${esc(task.brief || "")}</p></div>`;
+
+    // Candidates: diffs + rationale
+    html += `<h2>Candidates (${arena.candidates.length})</h2><div class="cards">`;
+    const fullDiffs = {};
+    for (const s of task.submissions || []) fullDiffs[s.agent_id] = s.diff;
+    for (const c of arena.candidates) {
+      const stat = c.diff_stat ? `+${c.diff_stat.additions}/-${c.diff_stat.deletions}` : "";
+      const files = (c.files_touched || []).map(esc).join(", ");
+      const diff = fullDiffs[c.agent_id] || "";
+      html += `<div class="card"><h3>${esc(c.name)} <span class="meta">${esc(c.agent_id)}</span></h3>
+        <div class="meta">files: ${files || "—"} · ${esc(stat)}</div>
+        <div class="rationale">“${esc(c.rationale)}”</div>
+        ${diff ? `<details class="diff"><summary>full diff</summary><pre>${tintDiff(diff)}</pre></details>` : ""}
+      </div>`;
+    }
+    html += `</div>`;
+
+    // Conflicts: side-by-side excerpts
+    if (arena.conflicts && arena.conflicts.length) {
+      html += `<h2>Conflicts (${arena.conflicts.length})</h2>`;
+      for (const k of arena.conflicts) {
+        html += `<div class="conflict"><div class="path">${esc(k.path)}</div><div class="sides">
+          <div class="side a"><div class="who">A — ${esc(k.a_name)}</div><pre>${esc(k.a_excerpt)}</pre></div>
+          <div class="side b"><div class="who">B — ${esc(k.b_name)}</div><pre>${esc(k.b_excerpt)}</pre></div>
+        </div></div>`;
+      }
+    }
+
+    // CI runs (from the merge-arena-ci queue consumer)
+    const runs = (ci && ci.runs) || [];
+    if (runs.length) {
+      const dot = { received: "#58a6ff", running: "#bb8009", passed: "#7ee787", failed: "#f85149" };
+      html += `<h2>CI runs (${runs.length})</h2><div class="card"><table style="width:100%;font-size:.85rem;border-collapse:collapse">`;
+      html += `<tr style="color:#8b949e;text-align:left"><th>repo</th><th>ref</th><th>sha</th><th>status</th><th>preview</th></tr>`;
+      for (const r of runs) {
+        const c0 = dot[r.status] || "#8b949e";
+        html += `<tr style="border-top:1px solid #30363d"><td>${esc(r.repo)}</td><td>${esc(String(r.ref).replace("refs/heads/", ""))}</td>`
+          + `<td><span class="meta">${esc(String(r.sha).slice(0, 8))}</span></td>`
+          + `<td><span style="color:${c0};font-weight:700">${esc(r.status)}</span></td>`
+          + `<td>${r.preview_url ? `<a href="${esc(r.preview_url)}" target="_blank" rel="noopener" style="color:#58a6ff">preview</a>` : "—"}</td></tr>`;
+      }
+      html += `</table></div>`;
+    }
+
+    // Human pick control
+    if (task.status === "arena") {
+      html += `<div class="decide"><h2>Human pick</h2>
+        ${arena.candidates.map((c, i) =>
+          `<label class="opt"><input type="radio" name="winner" value="${esc(c.agent_id)}" ${i === 0 ? "checked" : ""} /> ${esc(c.name)} <span class="meta">${esc(c.agent_id)}</span></label>`
+        ).join("")}
+        <textarea id="decideNote" placeholder="why this one wins (optional)"></textarea>
+        <button id="decideBtn">Decide winner</button>
+      </div>`;
+    }
+
+    // Result
+    if (task.result) {
+      const r = task.result;
+      html += `<div class="brief"><h2>Resolved ${badge}</h2>
+        <p>Winner: <strong>${esc(r.winner_agent_id)}</strong> · decided by ${esc(r.decided_by || "?")}</p>
+        ${r.rationale ? `<p class="rationale">“${esc(r.rationale)}”</p>` : ""}
+        ${r.winning_diff ? `<details class="diff" open><summary>winning diff</summary><pre>${tintDiff(r.winning_diff)}</pre></details>` : ""}
+      </div>`;
+    } else if (task.status === "merged") {
+      html += `<div class="brief"><h2>Auto-merged ${badge}</h2>
+        <details class="diff" open><summary>merged diff</summary><pre>${tintDiff(task.merged_diff || "")}</pre></details></div>`;
+    }
+
+    el.innerHTML = html;
+    const btn = $("decideBtn");
+    if (btn) btn.addEventListener("click", decide);
+  }
+
+  async function decide() {
+    const winner = document.querySelector('input[name="winner"]:checked');
+    if (!winner) return;
+    const btn = $("decideBtn");
+    btn.disabled = true;
+    try {
+      await fetchJSON(api(`/task/${taskId}/decide`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          winner_agent_id: winner.value,
+          decided_by: "arena-ui",
+          rationale: ($("decideNote").value || "").trim() || undefined,
+        }),
+      });
+      await refresh();
+    } catch (e) {
+      alert("Decide failed: " + e.message);
+      btn.disabled = false;
+    }
+  }
+
+  function schedule() {
+    if (timer) clearInterval(timer);
+    if ($("auto").checked) timer = setInterval(refresh, 3000);
+  }
+
+  $("loadBtn").addEventListener("click", () => {
+    const id = $("taskId").value.trim();
+    if (!id) return;
+    taskId = id;
+    const url = new URL(location.href);
+    url.searchParams.set("task", id);
+    history.replaceState(null, "", url);
+    refresh();
+    schedule();
+  });
+  $("auto").addEventListener("change", schedule);
+
+  // ?task= + ?api= deep links
+  (function init() {
+    const q = new URLSearchParams(location.search);
+    if (q.get("api")) $("apiBase").value = q.get("api");
+    if (q.get("task")) { $("taskId").value = q.get("task"); taskId = q.get("task"); refresh(); }
+    schedule();
+  })();
+  </script>
+</body>
+</html>

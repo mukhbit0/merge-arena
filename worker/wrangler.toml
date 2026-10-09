@@ -1,0 +1,43 @@
+# Merge Arena — Cloudflare Workers config
+# NEW worker only. Never reuse bindings from existing workers.
+
+name = "merge-arena"
+main = "src/index.ts"
+compatibility_date = "2026-10-09"
+compatibility_flags = ["nodejs_compat"]
+
+[dev]
+port = 8787
+
+# Artifacts binding (open beta, Workers Paid plan required). Namespace is
+# dedicated to this project — never point it at an existing namespace.
+[[artifacts]]
+binding = "ARTIFACTS"
+namespace = "merge-arena"
+# remote = true  # uncomment to use the remote Artifacts service in wrangler dev
+
+# Event subscriptions for the CI phase (VERIFIED 2026-10-09 against
+# developers.cloudflare.com/queues/event-subscriptions/events-schemas/):
+# Artifacts repo events are delivered to Workers Queues via EVENT
+# SUBSCRIPTIONS — there is no [[events]] wrangler block. Create with:
+#   wrangler queues subscription create <QUEUE> --source artifacts.repo \
+#     --events pushed --namespace merge-arena --repo-name <repo>
+# Event type: cf.artifacts.repo.pushed, payload: {ref, before, after, commits[]}.
+# Account-level (create/fork/import/delete) uses source `artifacts`.
+# Setup steps (deploy/ci phases):
+#   1. [[queues.producers]] / [[queues.consumers]] on the CI worker (below).
+#   2. wrangler queues subscription create for source artifacts.repo + events pushed.
+#   3. The consumer handler type-checks the event and starts a CI run.
+
+# Queue config goes here once the CI phase creates the queue (deploy phase):
+# [[queues.producers]]
+# queue = "merge-arena-events"
+# binding = "EVENTS"
+# [[queues.consumers]]
+# queue = "merge-arena-events"
+# max_batch_size = 10
+
+# KV binding — deploy phase only, via cf.py gated flow (new namespace only):
+# [[kv_namespaces]]
+# binding = "STATE_KV"
+# id = "81fd5d77354e4f58a9bc4f91fe8a8685"

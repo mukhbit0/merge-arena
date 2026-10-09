@@ -1,0 +1,1 @@
+{"compilerOptions":{"allowImportingTsExtensions":false,"lib":["ES2022"],"module":"ESNext","moduleResolution":"bundler","noEmit":true,"skipLibCheck":true,"strict":true,"target":"ES2022","types":["node"]},"include":["src","test","../worker/src/storage.ts"]}
