@@ -448,4 +448,66 @@ describe("artifacts-git (fake binding)", () => {
     await expect(backend.threeWay("a", "b", "c")).rejects.toThrow("not wired yet");
     await expect(backend.adoptMerge("a", "b", "c")).rejects.toThrow("not wired yet");
   });
+
+  it("mergePreview merges across three refs with no conflict on disjoint edits", async () => {
+    const contents = new Map<string, string>([
+      ["main:src/app.ts", "line1\nline2\n"],
+      ["refs/heads/agent-a:src/app.ts", "line1\nalpha\nline2\n"],
+      ["refs/heads/agent-b:src/app.ts", "line1\nline2\nbeta\n"],
+    ]);
+    const binding = {
+      async get(_name: string) {
+        return {
+          readFile: async ({ ref, path }: { ref: string; path: string }) => {
+            const key = `${ref}:${path}`;
+            if (!contents.has(key)) throw new Error("file not found");
+            return contents.get(key)!;
+          },
+        };
+      },
+    };
+    const backend = new ArtifactsGitBackend(binding as never);
+    const res = await backend.mergePreview({
+      repo: "repo",
+      baseRef: "main",
+      refA: "refs/heads/agent-a",
+      refB: "refs/heads/agent-b",
+      paths: ["src/app.ts"],
+    });
+    expect(res).toHaveLength(1);
+    expect(res[0].path).toBe("src/app.ts");
+    expect(res[0].overlap).toBe(false);
+    expect(res[0].conflict).toBe(false);
+    expect(res[0].merged).toBe("line1\nalpha\nline2\nbeta\n");
+  });
+
+  it("mergePreview flags a conflict when both sides change the same line", async () => {
+    const contents = new Map<string, string>([
+      ["main:src/app.ts", "line1\nline2\n"],
+      ["refs/heads/agent-a:src/app.ts", "line1\nalpha\n"],
+      ["refs/heads/agent-b:src/app.ts", "line1\nbeta\n"],
+    ]);
+    const binding = {
+      async get(_name: string) {
+        return {
+          readFile: async ({ ref, path }: { ref: string; path: string }) => {
+            const key = `${ref}:${path}`;
+            if (!contents.has(key)) throw new Error("file not found");
+            return contents.get(key)!;
+          },
+        };
+      },
+    };
+    const backend = new ArtifactsGitBackend(binding as never);
+    const res = await backend.mergePreview({
+      repo: "repo",
+      baseRef: "main",
+      refA: "refs/heads/agent-a",
+      refB: "refs/heads/agent-b",
+      paths: ["src/app.ts"],
+    });
+    expect(res[0].conflict).toBe(true);
+    expect(res[0].overlap).toBe(true);
+    expect(res[0].merged).toBeUndefined();
+  });
 });

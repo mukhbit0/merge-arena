@@ -23,9 +23,13 @@
 // - applyDiff throws: in artifacts mode agents push to their fork remotes.
 // - threeWay/adoptMerge are not implemented on raw repos: merging needs a
 //   file listing + a commit path, neither of which is in the verified binding
-//   surface. Merge computation stays in merge.ts (pure, tested); the
+//   surface. The read-only merge *preview* lives in mergePreview() (readFile
+//   at three refs + pure merge.ts computation, paths supplied by caller); the
 //   demo/deploy phases resolve where the merged commit lands (agent push of
-//   the winning fork, or a verified write path). These throw a clear error.
+//   the winning fork, or an orchestrator git merge with a minted write token).
+//   These throw a clear error.
+
+import { mergeFile, type FileMergeResult } from "./merge";
 
 export interface ArtifactsRepoHandle {
   info(): Promise<{ remote: string; defaultBranch?: string }>;
@@ -45,6 +49,13 @@ export interface ArtifactsBindingLike {
   delete(name: string): Promise<void>;
 }
 
+export interface MergePreviewFile {
+  path: string;
+  overlap: boolean;
+  conflict: boolean;
+  /** Merged text. Set only when !conflict. */
+  merged?: string;
+}
 export interface ArtifactsRepoAccess {
   name: string;
   remote: string;
@@ -120,6 +131,43 @@ export class ArtifactsGitBackend {
   async log(repoName: string, ref: string) {
     const repo = await this.artifacts.get(repoName);
     return repo.log({ ref });
+  }
+
+  /**
+   * Read-only merge preview: for each `path`, read contents at baseRef,
+   * refA, and refB and run the pure line-based 3-way merge from merge.ts.
+   * Paths must be supplied by the caller (e.g. submission `files_touched`)
+   * because the verified binding surface has no file listing. A file absent
+   * at a ref reads as "" (added or deleted). No write is implied — landing
+   * a merged result is the orchestrator's job (agent push of the winning
+   * fork, or an orchestrator git merge with a minted write token).
+   */
+  async mergePreview(opts: {
+    repo: string;
+    baseRef: string;
+    refA: string;
+    refB: string;
+    paths: string[];
+  }): Promise<MergePreviewFile[]> {
+    const repo = await this.artifacts.get(opts.repo);
+    const read = async (ref: string, path: string): Promise<string> => {
+      try {
+        return await repo.readFile({ ref, path });
+      } catch {
+        return "";
+      }
+    };
+    const out: MergePreviewFile[] = [];
+    for (const path of opts.paths) {
+      const [base, a, b] = await Promise.all([
+        read(opts.baseRef, path),
+        read(opts.refA, path),
+        read(opts.refB, path),
+      ]);
+      const r: FileMergeResult = mergeFile({ base, a, b });
+      out.push({ path, overlap: r.overlap, conflict: r.conflict, merged: r.merged });
+    }
+    return out;
   }
 
   /** Delete every repo created for a task (test/demo teardown). */
