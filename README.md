@@ -84,10 +84,3 @@ backend is the planned production path (see BUILD_STATE.json blockers).
 - Demo scenario: three agents push concurrently on one brief → arena resolves a
   real conflict → tests pass → preview deployed.
 
-## Project boundaries (hard rules)
-
-- New resources only: `merge-arena` worker, `merge-arena-state` KV namespace.
-- Never touch existing Cloudflare workers (esp. `mangaread-api`), KV namespaces,
-  or D1 databases.
-- Source lives only in this repo. Deployment of new resources goes through the
-  gated `cf.py` flow with the user's explicit approval.
