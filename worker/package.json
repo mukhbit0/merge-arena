@@ -1,0 +1,1 @@
+{"dependencies":{"hono":"^4.7.0"},"description":"Merge Arena — agent-native merge queue on Cloudflare Workers + Artifacts","devDependencies":{"@cloudflare/workers-types":"^4.20250913.0","typescript":"^5.6.3","wrangler":"^3.114.0"},"name":"merge-arena","private":true,"scripts":{"deploy":"wrangler deploy","dev":"wrangler dev","typecheck":"tsc --noEmit"},"version":"0.1.0"}

@@ -1,0 +1,19 @@
+# Merge Arena — Cloudflare Workers config
+# NEW worker only. Never reuse bindings from existing workers.
+
+name = "merge-arena"
+main = "src/index.ts"
+compatibility_date = "2026-10-09"
+compatibility_flags = ["nodejs_compat"]
+
+[dev]
+port = 8787
+
+# Future bindings (NOT created yet — deploy phase only, via cf.py gated flow):
+# [[kv_namespaces]]
+# binding = "STATE_KV"
+# id = "<new namespace id for merge-arena-state>"
+#
+# Artifacts repo binding (open beta, Workers Paid plan required):
+# [artifacts]
+# binding = "REPO"
