@@ -27,8 +27,8 @@
       "notes": "committed 00b76ab: Hono API (POST /task, GET /task/:id, POST /task/:id/submit, GET /task/:id/arena, POST /task/:id/decide, GET /health); storage abstraction (InMemory + KVState swap-ready); LocalGitBackend (real git, seedFixture/createWorktree/applyDiff/threeWay/adoptMerge, Node-only guard); scoped HMAC tokens; incremental N-agent merge via persistent merge branch (adoptMerge leaves merge tip advanced; conflict -> arena with 'merged so far' vs newcomer attribution); 14 vitest tests green, tsc clean. Known: LocalGitBackend 500s under wrangler dev (workerd has no fs/git) \u2014 by design, Artifacts backend comes in artifacts phase."
     },
     "artifacts": {
-      "status": "pending",
-      "notes": "Artifacts repo bindings, event subscriptions"
+      "status": "in_progress",
+      "notes": "ArtifactsGitBackend implemented (00b76ab+1): baseline repo per task + per-agent forks + short-lived write tokens + readFile/log, all against the OFFICIALLY verified binding surface (create/get/list/delete, info/createToken/fork/log/readFile); [[artifacts]] binding (namespace merge-arena) in wrangler.toml; getArtifactsGit() accessor. 16 tests green incl. fake-binding tests. REMAINING: threeWay/adoptMerge on Artifacts (no verified file-listing/commit path in binding \u2014 Worker has no git CLI; merge computation stays pure in merge.ts; deploy phase must verify a merge/write route live); event subscription wrangler shape (cf.artifacts.repo.pushed unverified); Workers Paid plan status of account unchecked."
     },
     "arena-ui": {
       "status": "pending",
@@ -55,7 +55,7 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T20:57:00+05:00",
+  "heartbeat": "2026-10-09T21:02:00+05:00",
   "blockers": [
     "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"
   ],
