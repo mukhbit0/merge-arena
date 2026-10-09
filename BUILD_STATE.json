@@ -16,15 +16,15 @@
       "any other repo"
     ]
   },
-  "current_phase": "worker-core",
+  "current_phase": "artifacts",
   "phases": {
     "scaffold": {
       "status": "done",
       "notes": "scaffold committed (a74bf89): worker skeleton (Hono TS, health + stub POST /task), arena-ui placeholder, ci-worker README, main README, .gitignore; npm install ok (62 pkgs), tsc clean, wrangler.toml valid; no deploy in this phase"
     },
     "worker-core": {
-      "status": "pending",
-      "notes": "Hono worker: POST /task, per-agent worktree fork, scoped tokens, task briefs"
+      "status": "done",
+      "notes": "committed 00b76ab: Hono API (POST /task, GET /task/:id, POST /task/:id/submit, GET /task/:id/arena, POST /task/:id/decide, GET /health); storage abstraction (InMemory + KVState swap-ready); LocalGitBackend (real git, seedFixture/createWorktree/applyDiff/threeWay/adoptMerge, Node-only guard); scoped HMAC tokens; incremental N-agent merge via persistent merge branch (adoptMerge leaves merge tip advanced; conflict -> arena with 'merged so far' vs newcomer attribution); 14 vitest tests green, tsc clean. Known: LocalGitBackend 500s under wrangler dev (workerd has no fs/git) \u2014 by design, Artifacts backend comes in artifacts phase."
     },
     "artifacts": {
       "status": "pending",
@@ -55,7 +55,7 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T20:25:36+05:00",
+  "heartbeat": "2026-10-09T20:57:00+05:00",
   "blockers": [
     "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"
   ],
