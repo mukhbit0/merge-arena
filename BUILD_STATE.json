@@ -16,7 +16,7 @@
       "any other repo"
     ]
   },
-  "current_phase": "deploy",
+  "current_phase": "demo",
   "phases": {
     "scaffold": {
       "status": "done",
@@ -39,8 +39,8 @@
       "notes": "merge-arena-ci worker: queue() consumer parses cf.artifacts.repo.pushed (schema verified against official events-schemas docs), maps arena-<taskId>-<suffix> repo names back to tasks, writes ci:<taskId>:<sha> + ci:<taskId>:latest records (status 'received'). Main worker: GET /task/:id/ci (list runs) + POST /task/:id/ci/:sha (status running|passed|failed + preview_url hook for the test runner). Arena UI shows CI runs table (repo/ref/sha/status/preview link). 4 ci tests + new CI endpoint test (g); 20 worker tests green, both tsc clean. DEFERRED to deploy: queue creation + event-subscription create (wrangler queues subscription create --source artifacts.repo --events pushed) + Workers Builds preview wiring."
     },
     "deploy": {
-      "status": "pending",
-      "notes": "deploy merge-arena worker + new KV to Cloudflare (cf.py gated, blanket go for new resources only)"
+      "status": "blocked",
+      "notes": "BLOCKED (tooling gap, 2026-10-09): cf.py has no worker-deploy and no kv-namespace-create commands (only worker-bindings-set for existing scripts + kv value ops). The task mandates cf.py gated commands ONLY for Cloudflare mutations, so the merge-arena worker + merge-arena-state KV namespace + merge-arena-events queue cannot be created through the authorized mechanism. Unblock options: extend cf.py with deploy/kv-create gated commands, or user explicitly authorizes wrangler deploy/kv commands directly. wrangler.toml files are deploy-ready (bindings commented for the gated flow). NOTHING was deployed; no existing resource touched."
     },
     "demo": {
       "status": "pending",
@@ -55,9 +55,10 @@
       "notes": "public repo push (repo mukhbit0/merge-arena must exist) + entry submission"
     }
   },
-  "heartbeat": "2026-10-09T21:22:04+05:00",
+  "heartbeat": "2026-10-09T21:23:13+05:00",
   "blockers": [
-    "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase"
+    "github repo mukhbit0/merge-arena does not exist yet (App 403 on create); needed before submit phase",
+    "deploy: cf.py lacks worker-deploy and kv-namespace-create \u2014 merge-arena worker/KV/queue cannot be created via the mandated gated flow (see deploy phase notes)"
   ],
   "active_run": {
     "started_at": "2026-10-09T21:04:25+05:00",
