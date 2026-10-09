@@ -16,7 +16,7 @@
       "any other repo"
     ]
   },
-  "current_phase": "video",
+  "current_phase": "submit",
   "phases": {
     "scaffold": {
       "status": "done",
@@ -47,29 +47,26 @@
       "notes": "ACTUALLY RAN (test/demo.test.ts, 21 tests green incl. demo): task created; 3 agents (ada/grace/hopper) submitted CONCURRENTLY via Promise.all \u2014 ada:awaiting_more, grace:auto_merged (disjoint edits), hopper:arena (real git conflict on the greet line). Arena showed merged-so-far (2 candidates) vs hopper. CI push event fed through the real ci-worker queue handler -> run recorded 'received' -> test runner hook flipped to 'passed' with preview URL. Human pick: hopper wins -> resolved. Transcript: demo/TRANSCRIPT.md. Concurrency fixes found by the demo: per-task promise-chain lock on submit/decide (read-modify-write race on task state) + async mutex around LocalGitBackend git ops (shared fixture repo). Honest scope: merge/CI logic ran against real git locally; Artifacts binding + queue delivery need the (blocked) deploy phase."
     },
     "video": {
-      "status": "in_progress",
-      "notes": "user override 2026-10-09 ~23:39 PKT: do everything, no review gate \u2014 finalize with best judgment"
+      "status": "done",
+      "notes": "FINALIZED 2026-10-09 (user override, no review gate): demo/final.mp4 committed 1dda36b \u2014 exactly 300.0s, H.264 1920x1080 30fps + AAC 48kHz, 17MB. 7 TTS narration segments (calm neutral voice, centered per shot), NEFFEX grateful music bed -18dB ducked under speech, real terminal capture (40s, draft watermark removed), arena screenshots w/ subtle ken-burns, CI received->passed + decide->resolved crossfades, outro card w/ repo URL. Reproducible: demo/render-final.sh. Frame-by-frame + audio-meter verification passed (subagent) and spot-verified (watchdog: frame composition matches source, mean pixel diff 6.3/255)."
     },
     "submit": {
-      "status": "in_progress",
-      "notes": "code pushed to origin/master (0373e1a); README run-instructions refreshed; submission form researched (cloudflare.com/git-competition/submit, open until Oct 14 11:59 PM PDT); submission copy drafted in goal hidden_files; video final render still running (subagent)"
+      "status": "blocked",
+      "notes": "code pushed to origin/master incl. video commit; README run-instructions refreshed; MIT LICENSE in root; submission form researched (cloudflare.com/git-competition/submit, OPEN, deadline Oct 14 11:59 PM PDT); submission copy drafted in goal hidden_files/submission-package.md. USER BLOCKERS: (1) repo is PRIVATE \u2014 user must flip to public in repo settings; (2) terms list US/Canada 18+ eligibility \u2014 his call; (3) form needs his team/contact/attendee details + legal attestations \u2014 cannot be done autonomously."
     }
   },
-  "heartbeat": "2026-10-09T18:53:54+05:00",
+  "heartbeat": "2026-10-09T19:14:12+05:00",
   "blockers": [
     "repo visibility: mukhbit0/merge-arena is PRIVATE (API 404, SSH ok) \u2014 needs user to flip to public in repo settings",
     "eligibility: terms list US/Canada residents 18+ \u2014 user in Lahore PK; his call",
     "submission form needs his details: team name/contact/location, attendee name(s)/email(s), plus his legal attestations",
     "follow-up (post-deploy): wire ArtifactsGitBackend into worker routes; per-fork artifacts.repo event subscriptions at task-creation time"
   ],
-  "active_run": {
-    "started_at": "2026-10-09T18:39:55+05:00",
-    "note": "watchdog run 23:39 PKT: video finalize + submit"
-  },
+  "active_run": null,
   "watchdog": {
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-09 23:5x PKT watchdog: video finalizing, form submission pending user (private repo, eligibility, form fields)"
+    "last_check": "2026-10-09 ~24:15 PKT watchdog: video FINALIZED + pushed; form submission awaits user (private repo, eligibility, form fields)"
   }
 }
