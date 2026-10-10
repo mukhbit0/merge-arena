@@ -87,7 +87,9 @@ ffmpeg -y -v error -f concat -safe 0 -i work/concat.txt -c copy work/video.mp4
 
 # --- audio: narration centered in each shot + music bed ducked under speech ---
 # narration offsets (ms) = shot_start + 500ms lead-in (narration starts WITH each shot)
-# shot starts: 0, 20, 50, 130, 210, 250, 260 (20/30/50/80/40/40/40 = 300s)
+# shot starts: 0, 20, 50, 100, 180, 220, 260 (20/30/50/80/40/40/40 = 300s)
+# (the 2026-10-09 build used 130/210/250 for shots 4-6 — wrong boundaries, caused
+#  30s-late narration and a 6/7 overlap; fixed 2026-10-10 in fix-sync.sh)
 #
 # Two-step build (deliberate): a single filtergraph that feeds one stream into
 # both sidechaincompress and amix silently drops the narration (ffmpeg quirk),
@@ -100,9 +102,9 @@ ffmpeg -y -v error \
 [0:a]adelay=500|500[a1];\
 [1:a]adelay=20500|20500[a2];\
 [2:a]adelay=50500|50500[a3];\
-[3:a]adelay=130500|130500[a4];\
-[4:a]adelay=210500|210500[a5];\
-[5:a]adelay=250500|250500[a6];\
+[3:a]adelay=100500|100500[a4];\
+[4:a]adelay=180500|180500[a5];\
+[5:a]adelay=220500|220500[a6];\
 [6:a]adelay=260500|260500[a7];\
 [a1][a2][a3][a4][a5][a6][a7]amix=inputs=7:normalize=0,apad=whole_dur=300,aformat=channel_layouts=stereo[narr]" \
   -map "[narr]" -c:a pcm_s16le -ar 48000 -t 300 work/narr.wav
