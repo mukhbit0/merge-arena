@@ -1,7 +1,7 @@
 ## Merge Arena demo transcript
 
 ### 1. Task created — brief: 'Greet the user; add a farewell helper'
-task 4d5b9cd3, agents: ada (agent-1), grace (agent-2), hopper (agent-3)
+task 927d3f2e, agents: ada (agent-1), grace (agent-2), hopper (agent-3)
 
 ### 2. All three agents push CONCURRENTLY (Promise.all)
 - agent-1: HTTP 200 -> status=awaiting_more
@@ -19,7 +19,7 @@ task status after concurrent push: arena (3 submissions)
 
 ### 4. CI: push event arrives on the queue, run recorded, test runner reports pass
 - CI runs: deadbee:received
-- after test runner: passed, preview https://preview.example/arena/4d5b9cd3
+- after test runner: passed, preview https://preview.example/arena/927d3f2e
 
 ### 5. Human pick: the newcomer wins
 - decided: resolved, winner agent-3
