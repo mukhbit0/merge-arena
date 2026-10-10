@@ -55,7 +55,7 @@
       "notes": "code pushed to origin/main (37 commits, HEAD c588aa9, in sync); README run-instructions refreshed; MIT LICENSE in root; submission form researched (cloudflare.com/git-competition/submit, OPEN, deadline Oct 14 11:59 PM PDT, form requires team/contact/attendee details + demo video upload + 'built with Workers+Artifacts' attestation); submission copy drafted in goal hidden_files/submission-package.md. 2026-10-10 ~01:30 PKT: REPO IS NOW PUBLIC (mukhbit0/merge-arena, main, MIT, 37 commits) — user flipped it. USER BLOCKERS REMAINING: (1) terms list US/Canada 18+ eligibility — his call; (2) form needs his team/contact/attendee details + video upload + legal attestations — cannot be done autonomously."
     }
   },
-  "heartbeat": "2026-10-10T08:46:00+00:00",
+  "heartbeat": "2026-10-10T09:00:00+00:00",
   "blockers": [
     "eligibility: terms (sec 3) require US/Canada residents 18+ — user in Lahore PK; his call",
     "ARTIFACTS-MODE FOLLOW-UP (partial, 2026-10-10 01:25 PKT): routes wired to ArtifactsGitBackend (task mode local|artifacts, optimistic rev, fork remotes + write tokens; commit 648e470, 32 tests green) — per-fork artifacts.repo event-subscription creation at task-creation time NOT yet implemented (needs Cloudflare API token in worker; design/security decision, hold for user review)",
@@ -66,7 +66,7 @@
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-10 13:40 PKT watchdog run: no change. submit API writes still 405 after trailing-slash 301 (POST/PUT/DELETE); form page 200; worker /health 200; origin/main in sync, local +2 bookkeeping commits (no-push rule). User-side blockers unchanged (eligibility US/Canada 18+, manual form details + video upload + attestations, Artifacts event-sub design)."
+    "last_check": "2026-10-10 13:55 PKT watchdog run: no change. submit API writes still 405 (POST /submissions and POST /submissions/ trailing-slash both 405; POST bogus id 405; GET /submissions 404); form page now 301 -> trailing-slash canonical, final 200 (no page move). Worker /health 200. origin/main (f7d49e1e) is ancestor of local HEAD — only local watchdog bookkeeping commits unpushed (no-push rule holds). User-side blockers unchanged (eligibility US/Canada 18+, manual form details + video upload + attestations, sec 4/13 forbid automated entry, Artifacts event-sub design)."
   },
   "submit": {
     "status": "blocked",
