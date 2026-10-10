@@ -55,18 +55,18 @@
       "notes": "code pushed to origin/main (37 commits, HEAD c588aa9, in sync); README run-instructions refreshed; MIT LICENSE in root; submission form researched (cloudflare.com/git-competition/submit, OPEN, deadline Oct 14 11:59 PM PDT, form requires team/contact/attendee details + demo video upload + 'built with Workers+Artifacts' attestation); submission copy drafted in goal hidden_files/submission-package.md. 2026-10-10 ~01:30 PKT: REPO IS NOW PUBLIC (mukhbit0/merge-arena, main, MIT, 37 commits) \u2014 user flipped it. USER BLOCKERS REMAINING: (1) terms list US/Canada 18+ eligibility \u2014 his call; (2) form needs his team/contact/attendee details + video upload + legal attestations \u2014 cannot be done autonomously."
     }
   },
-  "heartbeat": "2026-10-10T07:27:00+05:00",
+  "heartbeat": "2026-10-10T07:44:00+05:00",
   "blockers": [
     "eligibility: terms list US/Canada residents 18+ \u2014 user in Lahore PK; his call",
     "ARTIFACTS-MODE FOLLOW-UP (partial, 2026-10-10 01:25 PKT): routes wired to ArtifactsGitBackend (task mode local|artifacts, optimistic rev, fork remotes + write tokens; commit 648e470, 32 tests green) \u2014 per-fork artifacts.repo event-subscription creation at task-creation time NOT yet implemented (needs Cloudflare API token in worker; design/security decision, hold for user review)",
-    "SUBMIT API STILL DOWN (re-probed 2026-10-10 04:12 PKT): GET https://www.cloudflare.com/api/git-competition/submissions=404, POST=405, OPTIONS=405, HEAD=404. Form page https://www.cloudflare.com/git-competition/submit is LIVE (200, 'Submit your project for the Build the next GitHub Cloudflare Challenge') \u2014 submission is manual-form only (team/contact/attendee details + video upload + legal attestations). Watchdog probes each run; notify user when it starts accepting POSTs so he can resubmit. Deadline Oct 14."
+    "SUBMIT API STILL DOWN (re-probed 2026-10-10 07:43 PKT): GET https://www.cloudflare.com/api/git-competition/submissions=404, POST=405, OPTIONS=405, HEAD=404. Form page https://www.cloudflare.com/git-competition/submit is LIVE (200, 'Submit your project for the Build the next GitHub Cloudflare Challenge') \u2014 submission is manual-form only (team/contact/attendee details + video upload + legal attestations). Watchdog probes each run; notify user when it starts accepting POSTs so he can resubmit. Deadline Oct 14."
   ],
   "active_run": null,
   "watchdog": {
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-10 07:26 PKT watchdog run: submit API still down (GET 404 / POST 405 / HEAD 404 / OPTIONS 405); form page live (200); worker /health 200 {ok:true}, root 200; local/origin in sync (f7b016a); submit phase still blocked on user blockers (eligibility + manual form details)"
+    "last_check": "2026-10-10 07:44 PKT watchdog run: submit API still down (GET 404 / POST 405 / HEAD 404 / OPTIONS 405); form page live (200 via www 301); worker /health 200 {ok:true}; local/origin in sync (f8270a1); submit phase still blocked on user blockers (eligibility + manual form details)"
   },
   "submit": {
     "status": "blocked",
