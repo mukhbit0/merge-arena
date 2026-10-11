@@ -54,7 +54,7 @@ Local (Node 20+):
 ```bash
 cd worker
 npm install
-npm test                      # 36 tests incl. the 3-agent concurrent demo
+npm test                      # 32 tests incl. the 3-agent concurrent demo
 npm run typecheck              # tsc --noEmit
 npm run dev                    # wrangler dev on http://localhost:8787
 ```
