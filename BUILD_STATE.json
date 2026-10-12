@@ -59,8 +59,8 @@
       "notes": "Post-competition keepalive (2026-10-12 18:45 PKT): keep the merge-arena worker live and the 36 local tests green; stay silent. NEVER probe the competition submission API again (no POST/PUT/DELETE to /api/git-competition/*, no form-page checks). Commit state only when something actually changed."
     }
   },
-  "heartbeat": "2026-10-12T19:56:00.000000+00:00",
-  "last_check_note": "2026-10-13 00:55 PKT portfolio keepalive: worker /health + / both 200 live; 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired).",
+  "heartbeat": "2026-10-13T01:15:00.000000+05:00",
+  "last_check_note": "2026-10-13 01:10 PKT portfolio keepalive: worker /health + / both 200 live; 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired).",
   "blockers": [
     "CLOSED 2026-10-12 18:45 PKT: eligibility resolved - rules sec 3 requires US/Canada 18+; user in Lahore is ineligible. No longer his call; submission will not be attempted.",
     "ARTIFACTS-MODE FOLLOW-UP (partial, 2026-10-10 01:25 PKT): routes wired to ArtifactsGitBackend (task mode local|artifacts, optimistic rev, fork remotes + write tokens; commit 648e470, 32 tests green) \u2014 per-fork artifacts.repo event-subscription creation at task-creation time NOT yet implemented (needs Cloudflare API token in worker; design/security decision, hold for user review)"
@@ -70,7 +70,7 @@
     "interval": "15m",
     "inner_loop": "retry immediately within run, max 3 attempts per step",
     "claim_ttl_min": 45,
-    "last_check": "2026-10-12T19:42:00.000000+00:00",
+    "last_check": "2026-10-13T01:15:00.000000+05:00",
     "history": [
       "2026-10-11 07:55 PKT watchdog run: no change. worker /health + / both 200 live (0.95s/0.50s); 36 tests green locally (vitest, 4 files); submit API writes still 405 (POST initiate), GET bogus 404, form page 301 (www+slash redirect, consistent with prior). Submit phase stays blocked on user-side blockers (eligibility sec 3, manual form entry; sec 4/13 forbid automated entry).",
       "2026-10-11 08:10 PKT watchdog run: no change. worker /health + / both 200 live (0.84s/0.40s); 36 tests green locally (vitest, 4 files); submit API writes still 405 (POST initiate), GET bogus 404, form page 200. Submit phase stays blocked on user-side blockers (eligibility sec 3, manual form entry; sec 4/13 forbid automated entry).",
@@ -201,7 +201,8 @@
       "2026-10-12 23:41 PKT portfolio keepalive: worker /health + / both 200 live (--http1.1); 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired).",
       "2026-10-13 00:10 PKT portfolio keepalive: worker /health + / both 200 live; 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired).",
       "2026-10-13 00:25 PKT portfolio keepalive: worker /health + / both 200 live; 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired).",
-      "2026-10-13 00:42 PKT portfolio keepalive: worker /health + / both 200 live; 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired)."
+      "2026-10-13 00:42 PKT portfolio keepalive: worker /health + / both 200 live; 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired).",
+      "2026-10-13 01:10 PKT portfolio keepalive: worker /health + / both 200 live (--http1.1, 0.80s/0.40s); 36 tests green locally (vitest: 32 worker + 4 ci-worker, 4 files). No breakage; no submission probe (retired)."
     ]
   },
   "submit": {
