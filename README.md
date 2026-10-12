@@ -57,7 +57,13 @@ npm install
 npm test                      # 32 tests incl. the 3-agent concurrent demo
 npm run typecheck              # tsc --noEmit
 npm run dev                    # wrangler dev on http://localhost:8787
+
+cd ../ci-worker
+npm install
+npm test                      # 4 tests: queue consumer + push-event parsing
 ```
+
+Full suite: 36 green (32 worker + 4 ci-worker).
 
 Try it:
 
