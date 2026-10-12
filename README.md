@@ -75,18 +75,22 @@ curl -s -X POST localhost:8787/task -H 'content-type: application/json' \
 # open arena-ui/index.html?api=http://localhost:8787&task=<taskId> for the live arena view
 ```
 
-Live deployment: https://merge-arena.ionicerrrrscode.workers.dev
-(Cloudflare Workers + KV + Queues; `GET /health` for a smoke check)
-
 Note: `POST /task` runs the full git-backed merge locally. On the live
 Worker it returns 500 by design — workerd has no git; the Artifacts-backed
 backend is the planned production path (see BUILD_STATE.json blockers).
 
-## Competition entry
+## Demo
 
-- Competition: Cloudflare "build the next Git platform" — entries close 2026-10-14.
-- Entry requirements: 5–10 min demo video, OSS source (MIT — see LICENSE),
-  run/try instructions.
-- Demo scenario: three agents push concurrently on one brief → arena resolves a
-  real conflict → tests pass → preview deployed.
+Watch the 5-minute demo video: [demo/final.mp4](demo/final.mp4) — three agents
+push concurrently on one brief, the arena resolves a real conflict, tests pass,
+and a deploy preview spins up.
+
+Live deployment: https://merge-arena.ionicerrrrscode.workers.dev
+(`GET /health` for a smoke check)
+
+## Origin
+
+Built for Cloudflare's "build the next Git platform" competition (October
+2026); kept as a standalone open-source project under the MIT license
+(see LICENSE).
 
